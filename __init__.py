@@ -18,9 +18,17 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    for module in modules:
+        if hasattr(module, "register"):
+            module.register()
+
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+    for module in modules:
+        if hasattr(module, "unregister"):
+            module.unregister()
 
 if __name__ == "__main__":
     register()
