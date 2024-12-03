@@ -22,18 +22,24 @@ class CaptureWorkCollection(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
     
     def execute(self, context):
+        def wrapper(_, __):
+            # Saving the FBX file
+            replacement_map = {
+                r"VERSION": f'v{context.scene.tm_version:04}',
+                r"DATETIME": get_datetime()
+            }
+            pattern = '|'.join(f'({pattern})' for pattern in replacement_map.keys()) # Regex pattern from replacement map's keys
+            new_filepath = sub(pattern, lambda match: replacement_map[match.group(0)], context.scene.tm_save_filepath)
+            save_fbx(new_filepath, context.scene.tm_work_collection.name, {})
+            self.report({"INFO"}, f'Saved "{new_filepath}"')
 
-        # Saving the FBX file
-        replacement_map = {
-            r"VERSION": f'v{context.scene.tm_version:04}',
-            r"DATETIME": get_datetime()
-        }
-        pattern = '|'.join(f'({pattern})' for pattern in replacement_map.keys()) # Regex pattern from replacement map's keys
-        new_filepath = sub(pattern, lambda match: replacement_map[match.group(0)], context.scene.tm_save_filepath)
-        save_fbx(new_filepath, context.scene.tm_work_collection.name, {})
+            # Incrementing the version
+            context.scene.tm_version += 1
+            bpy.app.handlers.save_post.remove(wrapper)
         
-        # Incrementing the version
-        context.scene.tm_version += 1
+        # Saving the scene before exporting (in case of a crash)
+        bpy.app.handlers.save_post.append(wrapper)
+        bpy.ops.wm.save_as_mainfile()
         return {"FINISHED"}
     
 class ImportSnapshot(bpy.types.Operator):
