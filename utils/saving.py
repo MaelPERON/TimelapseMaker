@@ -5,7 +5,7 @@ from os import path, makedirs
 from re import sub
 
 def save_fbx(filepath, collection, options={}):
-    op_options = {"use_selection": False,"use_active_collection": True,"object_types": {"MESH"},"use_mesh_modifiers": False,"use_subsurf": False,"use_custom_props": True,"bake_anim": False,"path_mode": "AUTO","batch_mode": "OFF"}
+    op_options = {"use_selection": False,"use_active_collection": True,"object_types": {"MESH"},"use_mesh_modifiers": True,"use_subsurf": False,"use_custom_props": True,"bake_anim": False,"path_mode": "AUTO","batch_mode": "OFF"}
     op_options.update(options)
 
     # Create directory if needed
