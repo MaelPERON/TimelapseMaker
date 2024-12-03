@@ -18,6 +18,10 @@ from .ui import props as PROPS
 classes = (
     # OPERATORS
     CaptureWorkCollection,
+    ImportSnapshot,
+
+    # UI
+    SimplePanel
 )
 
 modules = (
