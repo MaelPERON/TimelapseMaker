@@ -18,9 +18,13 @@ def check_timer() -> None:
 		print("Export !")
 	return interval_check
 
-def start_session() -> None:
+def unregister_timer() -> None:
 	if bpy.app.timers.is_registered(check_timer): # Session already started
-			bpy.app.timers.unregister(check_timer)
+		bpy.app.timers.unregister(check_timer)
+
+def start_session() -> None:
+	session_state = True
+	unregister_timer()
 	bpy.app.timers.register(check_timer, first_interval=1, persistent=False)
 
 class StartRecordingSession(bpy.types.Operator):
