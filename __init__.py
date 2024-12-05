@@ -21,6 +21,7 @@ classes = (
     CaptureWorkCollection,
     ImportSnapshot,
     StartRecordingSession,
+    StopRecordingSession,
 
     # UI
     SimplePanel
