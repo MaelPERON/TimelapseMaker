@@ -27,6 +27,10 @@ def update_interface() -> None:
 
 def check_timer() -> None:
 	if diff := elapse_time_since_last_export() > export_frequence:
+		modal_ops = [operator.name for operator in bpy.context.window.modal_operators]
+		if len(modal_ops) > 0:
+			return interval_check
+		bpy.ops.scene.capture_work_collection()
 		restart_timer()
 		update_interface()
 	return interval_check
