@@ -22,8 +22,11 @@ def check_timer() -> None:
 	return interval_check
 
 def unregister_timer() -> None:
-	if bpy.app.timers.is_registered(check_timer): # Session already started
+	if is_registered(): # Session already started
 		bpy.app.timers.unregister(check_timer)
+
+def is_registered() -> bool:
+	return bpy.app.timers.is_registered(check_timer)
 
 def start_session() -> None:
 	session_state = True
