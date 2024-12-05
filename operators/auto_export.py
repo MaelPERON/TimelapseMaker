@@ -31,7 +31,7 @@ def is_registered() -> bool:
 def start_session() -> None:
 	session_state = True
 	unregister_timer()
-	bpy.app.timers.register(check_timer, first_interval=1, persistent=False)
+	bpy.app.timers.register(check_timer, first_interval=0, persistent=False)
 
 def stop_session() -> None:
 	global session_state
