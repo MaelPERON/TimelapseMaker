@@ -31,6 +31,20 @@ def update_interface() -> None:
 				region.tag_redraw()
 	pass
 
+def draw_panel(layout, context) -> None:
+	box = layout.box()
+	recording = is_registered()
+	box.label(text="Recording..." if recording else "No recording", icon="RECORD_" + ("ON" if recording else "OFF"))
+	box.prop(context.scene, "tm_work_collection")
+	row = box.row()
+	row.prop(context.scene, "tm_save_filepath")
+	row.prop(context.scene, "tm_version")
+	if recording:
+		if check_for_modal():
+			box.label(text=f"In pause. Wait for {','.join([op.name for op in get_modals()])} to finish.",icon="EVENT_PAUSE")
+		box.label(text="Next export : " + time.strftime("%H:%M:%S (%d/%m/%Y)", next_export()))
+
+
 def check_timer() -> None:
 	if diff := elapse_time_since_last_export() > export_frequence:
 		update_interface()
