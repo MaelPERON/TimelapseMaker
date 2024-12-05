@@ -31,6 +31,10 @@ def check_timer() -> None:
 		update_interface()
 	return interval_check
 
+def next_export() -> time.struct_time:
+	_next_export = last_export + export_frequence
+	return time.localtime(_next_export)
+
 def unregister_timer() -> None:
 	if is_registered(): # Session already started
 		bpy.app.timers.unregister(check_timer)
