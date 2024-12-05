@@ -9,6 +9,12 @@ session_state = False
 def elapse_time_since_last_export() -> float:
 	return time.time() - last_export
 
+def get_modals() -> list:
+	return [operator for operator in bpy.context.window.modal_operators]
+
+def check_for_modal() -> bool:
+	return len(get_modals())>0
+
 def restart_timer() -> None:
 	global last_export
 	global session_state
@@ -27,12 +33,10 @@ def update_interface() -> None:
 
 def check_timer() -> None:
 	if diff := elapse_time_since_last_export() > export_frequence:
-		modal_ops = [operator.name for operator in bpy.context.window.modal_operators]
-		if len(modal_ops) > 0:
-			return interval_check
+		update_interface()
+		if check_for_modal(): return interval_check
 		bpy.ops.scene.capture_work_collection()
 		restart_timer()
-		update_interface()
 	return interval_check
 
 def next_export() -> time.struct_time:
