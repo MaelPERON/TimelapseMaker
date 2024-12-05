@@ -12,6 +12,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 import bpy
 from .operators.snapshot import *
+from .operators.auto_export import *
 from .ui.panels import *
 from .ui import props as PROPS
 
@@ -19,6 +20,8 @@ classes = (
     # OPERATORS
     CaptureWorkCollection,
     ImportSnapshot,
+    StartRecordingSession,
+    StopRecordingSession,
 
     # UI
     SimplePanel
