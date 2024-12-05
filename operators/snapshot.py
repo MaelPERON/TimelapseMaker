@@ -30,8 +30,8 @@ class CaptureWorkCollection(bpy.types.Operator):
             }
             pattern = '|'.join(f'({pattern})' for pattern in replacement_map.keys()) # Regex pattern from replacement map's keys
             new_filepath = sub(pattern, lambda match: replacement_map[match.group(0)], context.scene.tm_save_filepath)
-            save_fbx(new_filepath, context.scene.tm_work_collection.name, {})
-            self.report({"INFO"}, f'Saved "{new_filepath}"')
+            save_fbx(new_filepath, context.scene.tm_work_collection.name, {"use_active_collection":True})
+            self.report({"INFO"}, f'[{replacement_map[r"DATETIME"]}] Saved "{new_filepath}"')
 
             # Incrementing the version
             context.scene.tm_version += 1
