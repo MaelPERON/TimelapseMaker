@@ -7,12 +7,12 @@ export_frequence = 0.5
 session_state = False
 
 def elapse_time_since_last_export() -> float:
-	return time.monotonic() - last_export
+	return time.time() - last_export
 
 def restart_timer() -> None:
 	global last_export
 	global session_state
-	last_export = time.monotonic()
+	last_export = time.time()
 	session_state = True
 
 def check_timer() -> None:
