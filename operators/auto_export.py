@@ -18,6 +18,11 @@ def check_timer() -> None:
 		print("Export !")
 	return interval_check
 
+def start_session() -> None:
+	if bpy.app.timers.is_registered(check_timer): # Session already started
+			bpy.app.timers.unregister(check_timer)
+	bpy.app.timers.register(check_timer, first_interval=1, persistent=False)
+
 class StartRecordingSession(bpy.types.Operator):
 	bl_idname = "scene.tm_start_session"
 	bl_label = "Start Recording Session"
@@ -36,8 +41,5 @@ class StartRecordingSession(bpy.types.Operator):
 		layout.prop(self, "frequence")
 	
 	def execute(self, context):
-		if bpy.app.timers.is_registered(check_timer): # Session already started
-			bpy.app.timers.unregister(check_timer)
-		bpy.app.timers.register(check_timer, first_interval=1, persistent=False)
-
+		start_session()
 		return {"FINISHED"}
