@@ -15,10 +15,20 @@ def restart_timer() -> None:
 	last_export = time.time()
 	session_state = True
 
+def update_interface() -> None:
+	"""
+	Refresh every interface where timer information is displayed (or used).
+	"""
+	for area in bpy.context.screen.areas:
+		for region in area.regions:
+			if region.type == "UI":
+				region.tag_redraw()
+	pass
+
 def check_timer() -> None:
 	if diff := elapse_time_since_last_export() > export_frequence:
 		restart_timer()
-		print("Export !")
+		update_interface()
 	return interval_check
 
 def unregister_timer() -> None:
