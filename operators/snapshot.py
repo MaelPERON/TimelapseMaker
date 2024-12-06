@@ -2,6 +2,7 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from re import sub
 from ..utils.saving import save_fbx, get_datetime
+from ..utils.importing import import_fbx, fbx_import_check
 
 class CaptureWorkCollection(bpy.types.Operator):
     bl_idname = "scene.capture_work_collection"
@@ -66,28 +67,18 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
         return {"RUNNING_MODAL"}
     
     def execute(self, context):
-        # Checking for errors
-        if not self.filepath.endswith(".fbx"): 
-            self.report({"ERROR"}, f'"{self.filepath}" is not an fbx file.')
-            return {"CANCELLED"}
-        if not os.path.exists(self.filepath):
-            self.report({"ERROR"}, f'"{self.filepath}" doesn\'t exist.')
-            return {"CANCELLED"}
-        
-        # Importing the object
-        bpy.ops.import_scene.fbx(filepath=self.filepath)
+        new_objs = []
+        for file in self.files:
+            filepath = self.directory + file.name
+            check = fbx_import_check(filepath)
+            if check<1:
+                self.report({"ERROR_INVALID_INPUT"}, file.name + " " + ("is not an fbx file" if check == 0 else "doesn't exist"))
+                pass
 
-        # Setting few things : joining objects
-        context.view_layer.objects.active = context.selected_objects[0]
-        bpy.ops.object.join()
-        bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
+            obj = import_fbx(context, filepath)
+            new_objs.append(obj)
 
-        obj = context.active_object
-        filename = os.path.basename(self.filepath).replace(".fbx", "")
-        obj.name = filename
-        obj.data['tm_is_snapshot'] = True
-        match = search(r"v(\d{1,})", filename)
-        if hasattr(match, "group"):
-            obj.tm_version = int(match.group(1))
-
+        for obj in new_objs:
+            obj.select_set(True)
+            context.view_layer.objects.active = obj
         return {"FINISHED"}
