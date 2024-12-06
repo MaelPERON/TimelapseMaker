@@ -79,6 +79,13 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
             new_objs.append(obj)
 
         for obj in new_objs:
-            obj.select_set(True)
-            context.view_layer.objects.active = obj
+            bool_expression = "not(self.tm_version == frame)"
+            # Hide render's driver
+            hide_render = obj.driver_add("hide_render", -1).driver
+            hide_render.use_self = True
+            hide_render.expression = bool_expression
+            # Display type's driver (2 = Wire | 5 = Textured)
+            display_type = obj.driver_add("display_type", -1).driver
+            display_type.use_self = True
+            display_type.expression = f'2 if {bool_expression} else 5'
         return {"FINISHED"}
