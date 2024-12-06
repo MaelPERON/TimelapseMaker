@@ -9,7 +9,7 @@ class CaptureWorkCollection(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        return True
+        return context.scene.tm_work_collection is not None and context.scene.tm_save_filepath != ""
     
     def draw(self, context):
         layout = self.layout
@@ -35,11 +35,15 @@ class CaptureWorkCollection(bpy.types.Operator):
 
             # Incrementing the version
             context.scene.tm_version += 1
-            bpy.app.handlers.save_post.remove(wrapper)
+            if wrapper in bpy.app.handlers.save_post:
+                bpy.app.handlers.save_post.remove(wrapper)
         
         # Saving the scene before exporting (in case of a crash)
-        bpy.app.handlers.save_post.append(wrapper)
-        bpy.ops.wm.save_as_mainfile()
+        if not bpy.data.filepath: # File is not saved
+            wrapper(None, None)
+        else:
+            bpy.app.handlers.save_post.append(wrapper)
+            bpy.ops.wm.save_as_mainfile()
         return {"FINISHED"}
     
 class ImportSnapshot(bpy.types.Operator):
