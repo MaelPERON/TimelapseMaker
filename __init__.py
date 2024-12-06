@@ -13,9 +13,9 @@
 import bpy
 from .operators.snapshot import *
 from .operators.auto_export import *
+from .app import props as PROPS
+from .app import driver_variables as VARS
 from .ui.panels import *
-from .ui import props as PROPS
-from .ui import driver_variables as VARS
 
 classes = (
     # OPERATORS
