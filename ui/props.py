@@ -6,5 +6,7 @@ def register():
     bpy.types.Scene.tm_version = bpy.props.IntProperty(min=0,name="Version")
     bpy.types.Scene.tm_timelapse_offset = bpy.props.IntProperty(min=1,default=1,name="Timelapse Offset")
     bpy.types.Scene.tm_timelapse_clip_duration = bpy.props.IntProperty(min=1,default=24,name="Snapshot Duration")
+    bpy.types.Scene.tm_timelapse_frame = bpy.props.IntProperty(min=1,default=1,name="Custom Frames")
+    bpy.types.Scene.tm_timelapse_use_frame = bpy.props.BoolProperty(default=False)
 
     bpy.types.Object.tm_version = bpy.props.IntProperty(min=0,name="Version")

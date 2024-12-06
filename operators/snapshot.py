@@ -79,7 +79,7 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
             new_objs.append(obj)
 
         for obj in new_objs:
-            bool_expression = "not(timelapse_bool(frame, self.tm_version, offset, duration))"
+            bool_expression = "not(timelapse_bool(frame, self.tm_version, offset, duration, use_custom_frames, custom_frames))"
 
             def set_driver(driver):
                 driver.use_self = True
@@ -97,6 +97,20 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
                 target = duration.targets[0]
                 target.context_property = "ACTIVE_SCENE"
                 target.data_path = "tm_timelapse_clip_duration"
+                # Use custom frames
+                use_custom_frames = driver.variables.new()
+                use_custom_frames.name = "use_custom_frames"
+                use_custom_frames.type = "CONTEXT_PROP"
+                target = use_custom_frames.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_use_frame"
+                # Custom Frames
+                custom_frames = driver.variables.new()
+                custom_frames.name = "custom_frames"
+                custom_frames.type = "CONTEXT_PROP"
+                target = custom_frames.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_frame"
 
             # Hide render's driver
             hide_render = obj.driver_add("hide_render", -1).driver
