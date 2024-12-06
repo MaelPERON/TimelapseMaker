@@ -83,31 +83,10 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
             new_objs.append(obj)
 
         for obj in new_objs:
-            bool_expression = "not(timelapse_bool(frame, self.tm_version, offset, duration, use_custom_frames, custom_frames))"
+            bool_expression = "not(timelapse_bool(custom_frames, self.tm_version))"
 
             def set_driver(driver):
                 driver.use_self = True
-                # Offset variable
-                offset = driver.variables.new()
-                offset.name = "offset"
-                offset.type = "CONTEXT_PROP"
-                target = offset.targets[0]
-                target.context_property = "ACTIVE_SCENE"
-                target.data_path = "tm_timelapse_offset"
-                # Duration variable
-                duration = driver.variables.new()
-                duration.name = "duration"
-                duration.type = "CONTEXT_PROP"
-                target = duration.targets[0]
-                target.context_property = "ACTIVE_SCENE"
-                target.data_path = "tm_timelapse_clip_duration"
-                # Use custom frames
-                use_custom_frames = driver.variables.new()
-                use_custom_frames.name = "use_custom_frames"
-                use_custom_frames.type = "CONTEXT_PROP"
-                target = use_custom_frames.targets[0]
-                target.context_property = "ACTIVE_SCENE"
-                target.data_path = "tm_timelapse_use_frame"
                 # Custom Frames
                 custom_frames = driver.variables.new()
                 custom_frames.name = "custom_frames"
