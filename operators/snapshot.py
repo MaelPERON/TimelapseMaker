@@ -111,13 +111,24 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
                 target = custom_frames.targets[0]
                 target.context_property = "ACTIVE_SCENE"
                 target.data_path = "tm_timelapse_frame"
+                # Display hidden
+                display_hidden = driver.variables.new()
+                display_hidden.name = "display_hidden"
+                display_hidden.type = "CONTEXT_PROP"
+                target = display_hidden.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_display_hidden"
 
             # Hide render's driver
             hide_render = obj.driver_add("hide_render", -1).driver
             set_driver(hide_render)
             hide_render.expression = bool_expression
+            # Hide viewport's driver
+            hide_viewport = obj.driver_add("hide_viewport", -1).driver
+            set_driver(hide_viewport)
+            hide_viewport.expression = f'{bool_expression} if display_hidden == "hidden" else 0'
             # Display type's driver (2 = Wire | 5 = Textured)
             display_type = obj.driver_add("display_type", -1).driver
             set_driver(display_type)
-            display_type.expression = f'2 if {bool_expression} else 5'
+            display_type.expression = f'display(display_hidden) if {bool_expression} else 5'
         return {"FINISHED"}
