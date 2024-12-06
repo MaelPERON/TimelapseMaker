@@ -17,8 +17,13 @@ def import_fbx(context, filepath):
 	# Importing the object
 	bpy.ops.import_scene.fbx(filepath=filepath)
 
+	objs = context.selected_objects
+	if len(objs) < 1:
+		print("Empty")
+		return None
+
 	# Setting few things : joining objects
-	context.view_layer.objects.active = context.selected_objects[0]
+	context.view_layer.objects.active = objs[0]
 	bpy.ops.object.join()
 	bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
 

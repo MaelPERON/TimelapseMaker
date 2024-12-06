@@ -50,6 +50,7 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
 
     # filepath: bpy.props.StringProperty(subtype="FILE_PATH",default="//")
 
+    filter_glob : bpy.props.StringProperty(default="*.fbx")
     directory : bpy.props.StringProperty(subtype="DIR_PATH")
     filename : bpy.props.StringProperty(subtype="FILE_NAME")
 
@@ -73,9 +74,12 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
             check = fbx_import_check(filepath)
             if check<1:
                 self.report({"ERROR_INVALID_INPUT"}, file.name + " " + ("is not an fbx file" if check == 0 else "doesn't exist"))
-                pass
+                continue
 
             obj = import_fbx(context, filepath)
+            if obj is None:
+                self.report({"WARNING"}, f'"{file.name}" is empty. no object found!')
+                continue
             new_objs.append(obj)
 
         for obj in new_objs:
