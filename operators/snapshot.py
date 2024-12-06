@@ -79,13 +79,31 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
             new_objs.append(obj)
 
         for obj in new_objs:
-            bool_expression = "not(self.tm_version == frame)"
+            bool_expression = "not(timelapse_bool(frame, self.tm_version, offset, duration))"
+
+            def set_driver(driver):
+                driver.use_self = True
+                # Offset variable
+                offset = driver.variables.new()
+                offset.name = "offset"
+                offset.type = "CONTEXT_PROP"
+                target = offset.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_offset"
+                # Duration variable
+                duration = driver.variables.new()
+                duration.name = "duration"
+                duration.type = "CONTEXT_PROP"
+                target = duration.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_clip_duration"
+
             # Hide render's driver
             hide_render = obj.driver_add("hide_render", -1).driver
-            hide_render.use_self = True
+            set_driver(hide_render)
             hide_render.expression = bool_expression
             # Display type's driver (2 = Wire | 5 = Textured)
             display_type = obj.driver_add("display_type", -1).driver
-            display_type.use_self = True
+            set_driver(display_type)
             display_type.expression = f'2 if {bool_expression} else 5'
         return {"FINISHED"}
