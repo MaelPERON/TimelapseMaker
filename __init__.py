@@ -15,6 +15,7 @@ from .operators.snapshot import *
 from .operators.auto_export import *
 from .ui.panels import *
 from .ui import props as PROPS
+from .ui import driver_variables as VARS
 
 classes = (
     # OPERATORS
@@ -29,6 +30,7 @@ classes = (
 
 modules = (
     PROPS,
+    VARS
 )
 
 def register():

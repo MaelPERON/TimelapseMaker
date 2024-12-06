@@ -1,7 +1,8 @@
 import bpy
-from re import sub, search
-import os
+from bpy_extras.io_utils import ImportHelper
+from re import sub
 from ..utils.saving import save_fbx, get_datetime
+from ..utils.importing import import_fbx, fbx_import_check
 
 class CaptureWorkCollection(bpy.types.Operator):
     bl_idname = "scene.capture_work_collection"
@@ -46,12 +47,18 @@ class CaptureWorkCollection(bpy.types.Operator):
             bpy.ops.wm.save_as_mainfile()
         return {"FINISHED"}
     
-class ImportSnapshot(bpy.types.Operator):
+class ImportSnapshot(bpy.types.Operator, ImportHelper):
     bl_idname = "object.tm_import_snapshot"
     bl_label = "Import Snapshot File"
     bl_options = {"REGISTER","UNDO"}
 
-    filepath: bpy.props.StringProperty(subtype="FILE_PATH",default="//")
+    # filepath: bpy.props.StringProperty(subtype="FILE_PATH",default="//")
+
+    filter_glob : bpy.props.StringProperty(default="*.fbx")
+    directory : bpy.props.StringProperty(subtype="DIR_PATH")
+    filename : bpy.props.StringProperty(subtype="FILE_NAME")
+
+    files: bpy.props.CollectionProperty(type=bpy.types.OperatorFileListElement)
 
     @classmethod
     def poll(self, context):
@@ -65,28 +72,50 @@ class ImportSnapshot(bpy.types.Operator):
         return {"RUNNING_MODAL"}
     
     def execute(self, context):
-        # Checking for errors
-        if not self.filepath.endswith(".fbx"): 
-            self.report({"ERROR"}, f'"{self.filepath}" is not an fbx file.')
-            return {"CANCELLED"}
-        if not os.path.exists(self.filepath):
-            self.report({"ERROR"}, f'"{self.filepath}" doesn\'t exist.')
-            return {"CANCELLED"}
-        
-        # Importing the object
-        bpy.ops.import_scene.fbx(filepath=self.filepath)
+        new_objs = []
+        for file in self.files:
+            filepath = self.directory + file.name
+            check = fbx_import_check(filepath)
+            if check<1:
+                self.report({"ERROR_INVALID_INPUT"}, file.name + " " + ("is not an fbx file" if check == 0 else "doesn't exist"))
+                continue
 
-        # Setting few things : joining objects
-        context.view_layer.objects.active = context.selected_objects[0]
-        bpy.ops.object.join()
-        bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
+            obj = import_fbx(context, filepath)
+            if obj is None:
+                self.report({"WARNING"}, f'"{file.name}" is empty. no object found!')
+                continue
+            new_objs.append(obj)
 
-        obj = context.active_object
-        filename = os.path.basename(self.filepath).replace(".fbx", "")
-        obj.name = filename
-        obj.data['tm_is_snapshot'] = True
-        match = search(r"v(\d{1,})", filename)
-        if hasattr(match, "group"):
-            obj.tm_version = int(match.group(1))
+        for obj in new_objs:
+            bool_expression = "not(timelapse_bool(custom_frames, self.tm_version))"
 
+            def set_driver(driver):
+                driver.use_self = True
+                # Custom Frames
+                custom_frames = driver.variables.new()
+                custom_frames.name = "custom_frames"
+                custom_frames.type = "CONTEXT_PROP"
+                target = custom_frames.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_frame"
+                # Display hidden
+                display_hidden = driver.variables.new()
+                display_hidden.name = "display_hidden"
+                display_hidden.type = "CONTEXT_PROP"
+                target = display_hidden.targets[0]
+                target.context_property = "ACTIVE_SCENE"
+                target.data_path = "tm_timelapse_display_hidden"
+
+            # Hide render's driver
+            hide_render = obj.driver_add("hide_render", -1).driver
+            set_driver(hide_render)
+            hide_render.expression = bool_expression
+            # Hide viewport's driver
+            hide_viewport = obj.driver_add("hide_viewport", -1).driver
+            set_driver(hide_viewport)
+            hide_viewport.expression = f'{bool_expression} if display_hidden == "hidden" else 0'
+            # Display type's driver (2 = Wire | 5 = Textured)
+            display_type = obj.driver_add("display_type", -1).driver
+            set_driver(display_type)
+            display_type.expression = f'display(display_hidden) if {bool_expression} else 5'
         return {"FINISHED"}
