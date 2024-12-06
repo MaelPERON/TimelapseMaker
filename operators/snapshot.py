@@ -1,6 +1,6 @@
 import bpy
-from re import sub, search
-import os
+from bpy_extras.io_utils import ImportHelper
+from re import sub
 from ..utils.saving import save_fbx, get_datetime
 
 class CaptureWorkCollection(bpy.types.Operator):
@@ -42,12 +42,17 @@ class CaptureWorkCollection(bpy.types.Operator):
         bpy.ops.wm.save_as_mainfile()
         return {"FINISHED"}
     
-class ImportSnapshot(bpy.types.Operator):
+class ImportSnapshot(bpy.types.Operator, ImportHelper):
     bl_idname = "object.tm_import_snapshot"
     bl_label = "Import Snapshot File"
     bl_options = {"REGISTER","UNDO"}
 
-    filepath: bpy.props.StringProperty(subtype="FILE_PATH",default="//")
+    # filepath: bpy.props.StringProperty(subtype="FILE_PATH",default="//")
+
+    directory : bpy.props.StringProperty(subtype="DIR_PATH")
+    filename : bpy.props.StringProperty(subtype="FILE_NAME")
+
+    files: bpy.props.CollectionProperty(type=bpy.types.OperatorFileListElement)
 
     @classmethod
     def poll(self, context):
