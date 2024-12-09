@@ -13,6 +13,7 @@
 import bpy
 from .operators.snapshot import *
 from .operators.auto_export import *
+from .operators import auto_export as AUTO_EXPORT
 from .app import props as PROPS
 from .app import driver_variables as VARS
 from .ui.panels import *
@@ -34,7 +35,8 @@ classes = (
 
 modules = (
     PROPS,
-    VARS
+    VARS,
+    AUTO_EXPORT
 )
 
 def register():

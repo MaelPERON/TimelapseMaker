@@ -1,10 +1,16 @@
 import bpy
 import time
+from ..utils.addon import preferences
 
 last_export: float = float("-inf")
 interval_check = 0.5
 export_frequency = 25
 session_state = False
+
+def register():
+	prefs = preferences()
+	global export_frequency
+	export_frequency = prefs.frequency
 
 def elapse_time_since_last_export() -> float:
 	return time.time() - last_export
@@ -78,7 +84,7 @@ class StartRecordingSession(bpy.types.Operator):
 	bl_idname = "scene.tm_start_session"
 	bl_label = "Start Recording Session"
 
-	frequence: bpy.props.FloatProperty(name="Export Frequence",min=1,default=5)
+	frequency: bpy.props.FloatProperty(name="Export Frequence",min=1)
 	
 	@classmethod
 	def poll(self, context):
