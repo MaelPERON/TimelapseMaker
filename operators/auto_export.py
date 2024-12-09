@@ -3,7 +3,7 @@ import time
 
 last_export: float = float("-inf")
 interval_check = 0.5
-export_frequence = 0.5
+export_frequency = 25
 session_state = False
 
 def elapse_time_since_last_export() -> float:
@@ -46,7 +46,7 @@ def draw_panel(layout, context) -> None:
 
 
 def check_timer() -> None:
-	if diff := elapse_time_since_last_export() > export_frequence:
+	if diff := elapse_time_since_last_export() > export_frequency:
 		update_interface()
 		if check_for_modal(): return interval_check
 		bpy.ops.scene.capture_work_collection()
@@ -54,7 +54,7 @@ def check_timer() -> None:
 	return interval_check
 
 def next_export() -> time.struct_time:
-	_next_export = last_export + export_frequence
+	_next_export = last_export + export_frequency
 	return time.localtime(_next_export)
 
 def unregister_timer() -> None:
@@ -89,7 +89,7 @@ class StartRecordingSession(bpy.types.Operator):
 	
 	def draw(self, context):
 		layout = self.layout
-		layout.prop(self, "frequence")
+		layout.prop(self, "frequency")
 	
 	def execute(self, context):
 		start_session()
