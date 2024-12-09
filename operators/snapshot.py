@@ -87,7 +87,7 @@ class ImportSnapshot(bpy.types.Operator, ImportHelper):
             new_objs.append(obj)
 
         for obj in new_objs:
-            bool_expression = "not(timelapse_bool(custom_frames, self.tm_version))"
+            bool_expression = "custom_frames != self.tm_version"
 
             def set_driver(driver):
                 driver.use_self = True
