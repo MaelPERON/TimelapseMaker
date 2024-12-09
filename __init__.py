@@ -16,6 +16,7 @@ from .operators.auto_export import *
 from .app import props as PROPS
 from .app import driver_variables as VARS
 from .ui.panels import *
+from .ui.preferences import *
 
 classes = (
     # OPERATORS
@@ -25,7 +26,10 @@ classes = (
     StopRecordingSession,
 
     # UI
-    SimplePanel
+    SimplePanel,
+
+    # PREFERENCES
+    TM_Preferences
 )
 
 modules = (
